@@ -17,8 +17,8 @@
             --ungc-gold: #D4AF37; /* Acento Premium */
         }
 
-        /* --- SCROLLBAR PERSONALIZADA (Identidade Visual) --- */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        /* --- SCROLLBAR PERSONALIZADA --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F1F5F9; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--ungc-blue); }
@@ -45,11 +45,10 @@
 
         /* Mobile Ajustes (< 768px) */
         @media (max-width: 768px) {
-            .roadmap-phase { padding-left: 50px; margin-bottom: 3rem; }
+            .roadmap-phase { padding-left: 45px; margin-bottom: 3rem; }
             .phase-badge { 
                 width: 42px; font-size: 0.65rem; padding: 0.25rem 0; left: 0;
             }
-            /* Linha vertical alinhada com o badge menor */
             .roadmap-phase::before { left: 20px; top: 25px; bottom: -3rem; } 
             .phase-title { font-size: 1.1rem; }
         }
@@ -73,8 +72,16 @@
 
         /* Modal Styles Responsive */
         .modal-overlay { background-color: rgba(30, 50, 80, 0.95); backdrop-filter: blur(5px); }
-        .modal-content { max-height: 90vh; width: 95vw; max-width: 1200px; overflow-y: auto; background: #F3F4F6; display: flex; flex-direction: column; }
-        .preview-container { background-image: radial-gradient(#E5E7EB 1px, transparent 1px); background-size: 20px 20px; min-height: 300px; padding: 1rem; }
+        /* Ajuste de altura máxima para mobile landscape */
+        .modal-content { max-height: 90vh; height: auto; width: 95vw; max-width: 1200px; overflow: hidden; background: #F3F4F6; display: flex; flex-direction: column; }
+        
+        .preview-container { 
+            background-image: radial-gradient(#E5E7EB 1px, transparent 1px); 
+            background-size: 20px 20px; 
+            min-height: 300px; 
+            padding: 1rem; 
+            overflow-y: auto; /* Scroll interno crucial para mobile */
+        }
         @media (min-width: 768px) { .preview-container { padding: 2rem; } }
 
         /* Tabs Sticky Logic */
@@ -83,119 +90,197 @@
         .tab-btn:hover { color: var(--ungc-dark); }
         .tab-btn.active { color: var(--ungc-dark); border-bottom-color: var(--ungc-dark); font-weight: 800; }
 
+        /* Sitemap Table */
+        .seo-table { min-width: 600px; } /* Força scroll horizontal em mobile se necessário */
+        .seo-table th { text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; color: #6B7280; background: #F9FAFB; padding: 0.75rem 1rem; text-align: left; font-weight: 700; }
+        .seo-table td { padding: 1rem; border-top: 1px solid #E5E7EB; font-size: 0.85rem; color: #374151; }
+        .seo-badge { font-size: 0.65rem; padding: 2px 6px; rounded: 4px; font-weight: 700; text-transform: uppercase; }
+
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        
+        /* Utility Classes for Chevron Rotation */
+        .rotate-180 { transform: rotate(180deg); }
+        .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
     <!-- ========================================== -->
-    <!-- TEMPLATES DE COMPONENTES (Para o Modal)    -->
-    <!-- Totalmente responsivos usando Tailwind     -->
+    <!-- TEMPLATES DE COMPONENTES (Sync DS v13)     -->
     <!-- ========================================== -->
 
     <!-- 1. Capsule Header Template -->
     <template id="tpl-header">
         <div class="w-full flex justify-center py-4 md:py-10 px-0 md:px-4">
-            <!-- Container do Header -->
-            <div class="w-full max-w-5xl bg-[#1E3250] rounded-none md:rounded-2xl p-3 md:p-4 flex items-center justify-between shadow-2xl border-b md:border border-[#1E3250]">
+            <div class="w-[98%] max-w-6xl bg-[#1E3250] rounded-full p-2 md:p-3 px-3 md:px-4 flex items-center justify-between shadow-2xl transition-all duration-500">
                 <!-- Esquerda -->
-                <div class="flex items-center gap-3 md:gap-6">
-                    <button class="flex items-center gap-2 p-2 md:pr-4 bg-white rounded-full text-[#1E3250] hover:bg-[#EEF2F7] transition-all shadow-md active:scale-95">
-                        <i data-lucide="menu" class="w-5 h-5"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest hidden md:block">Menu</span>
+                <div class="flex items-center gap-2 md:gap-6 z-20 relative shrink-0">
+                    <button class="flex items-center gap-2 p-1.5 md:p-2 md:pr-4 bg-white rounded-full text-[#1E3250] hover:bg-[#EEF2F7] transition-all shadow-md active:scale-95">
+                        <i data-lucide="menu" class="w-4 h-4 md:w-5 md:h-5"></i>
+                        <span class="text-[10px] font-black uppercase tracking-widest hidden lg:block">Menu</span>
                     </button>
+                    
                     <div class="h-6 w-px bg-white/10 hidden md:block"></div>
-                    <div class="flex items-center gap-2 text-white">
-                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-[#1E3250] shadow-sm shrink-0">
-                            <span class="font-bold text-xs">UN</span>
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 md:w-8 md:h-8 bg-white rounded-full flex items-center justify-center text-[#1E3250] shadow-sm">
+                            <i data-lucide="globe" class="w-4 h-4 md:w-5 md:h-5"></i>
                         </div>
-                        <div class="flex flex-col leading-none">
-                            <span class="font-black text-[10px] md:text-xs uppercase tracking-tight">Global Compact</span>
-                            <span class="text-[8px] md:text-[9px] uppercase tracking-[0.2em] opacity-80 hidden sm:block">Rede Brasil</span>
+                        <img src="./logo-pacto.png" alt="Pacto" class="h-6 md:h-8 hidden xl:block brightness-0 invert" onerror="this.style.display='none'">
+                        <!-- Fallback texto -->
+                        <div class="flex flex-col xl:hidden">
+                             <span class="font-black text-[9px] md:text-xs tracking-tight uppercase text-white leading-none">UN Global Compact</span>
                         </div>
                     </div>
                 </div>
                 <!-- Direita -->
-                <div class="flex items-center gap-2 md:gap-3">
-                    <button class="px-4 py-2 md:px-6 md:py-3 bg-[#297D6D] text-white text-[10px] md:text-xs font-bold uppercase tracking-wider rounded-full hover:bg-[#1E5C4F] shadow-lg shadow-[#297D6D]/20 whitespace-nowrap">
-                        Aderir
+                <div class="flex items-center justify-end gap-1.5 md:gap-3 z-20 relative shrink-0">
+                    <button class="bg-[#297D6D] text-white hover:bg-[#1E5C4F] shadow-lg shadow-[#297D6D]/20 px-3 py-1.5 md:px-4 md:py-2 rounded-full font-bold uppercase tracking-wider text-[9px] md:text-xs whitespace-nowrap transition-all">
+                        Quero Aderir
                     </button>
-                    <button class="flex items-center gap-2 px-3 py-2 text-white text-xs font-bold uppercase tracking-wider hover:text-[#CCB146]">
-                        <i data-lucide="log-in" class="w-5 h-5 md:w-4 md:h-4"></i> <span class="hidden md:inline">Entrar</span>
+                    <button class="hidden sm:flex text-white hover:text-[#CCB146] font-bold px-3 py-2 text-[9px] md:text-xs items-center gap-2 uppercase">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i> Entrar
                     </button>
                 </div>
             </div>
         </div>
     </template>
 
-    <!-- 2. Super Menu Template -->
+    <!-- 2. Super Menu Template (CORRIGIDO: Estrutura de Dropdowns) -->
     <template id="tpl-menu">
-        <div class="w-full h-[85vh] md:h-[700px] bg-[#1E3250] md:rounded-xl overflow-hidden flex flex-col relative shadow-2xl">
+        <div class="w-full h-full bg-[#1E3250] flex flex-col relative overflow-hidden">
             <!-- Header do Menu -->
-            <div class="p-4 md:p-8 border-b border-white/10 flex justify-between items-center bg-[#0B1220] shrink-0 sticky top-0 z-10">
-                <div class="flex flex-col">
-                    <span class="text-[#CCB146] font-black text-base md:text-lg uppercase tracking-widest">Menu</span>
-                    <span class="text-white/50 text-[8px] md:text-[10px] uppercase tracking-widest">Navegação Global</span>
-                </div>
-                <div class="p-2 bg-white/5 rounded-full text-white cursor-pointer hover:bg-white/10 active:bg-white/20" onclick="closeModal()">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </div>
-            </div>
-            <!-- Corpo do Menu (Scroll) -->
-            <div class="flex-1 p-4 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 overflow-y-auto">
-                <!-- Busca Mobile -->
-                <div class="col-span-1 md:col-span-12">
-                    <div class="relative group">
-                        <i data-lucide="search" class="absolute left-4 top-3.5 w-4 h-4 text-white/50 group-focus-within:text-[#CCB146] transition-colors"></i>
-                        <input type="text" placeholder="BUSCAR..." class="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 text-white text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#CCB146] focus:bg-white/10 transition-all">
+            <div class="flex justify-between items-center p-4 md:p-8 border-b border-white/10 shrink-0 bg-[#1E3250]">
+                <div class="flex items-center gap-3 md:gap-4">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center text-[#1E3250]">
+                        <i data-lucide="globe" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-white font-black text-sm md:text-lg uppercase tracking-tight leading-none">UN Global Compact</span>
+                        <span class="text-[#CCB146] text-[8px] md:text-[10px] uppercase tracking-[0.2em] leading-none mt-1">Menu Principal</span>
                     </div>
                 </div>
-                
-                <!-- Coluna Esquerda -->
-                <div class="col-span-1 md:col-span-5 space-y-2">
-                    <h3 class="text-[#CCB146] text-xs font-bold uppercase tracking-widest border-b border-white/10 pb-2 mb-4">Destaques</h3>
-                    <div class="group">
-                        <button class="menu-accordion-trigger flex items-center justify-between w-full text-left py-2 md:py-3">
-                            <span class="text-lg md:text-3xl font-black uppercase text-white group-hover:text-[#CCB146] transition-colors">Pacto Global</span>
-                            <i data-lucide="chevron-down" class="w-5 h-5 text-white/50"></i>
-                        </button>
-                        <div class="menu-accordion-content hidden pl-4 border-l-2 border-[#CCB146]/30 ml-2 space-y-2 py-2">
-                            <a href="#" class="block text-sm text-[#AECFE6]">Sobre Nós</a>
-                            <a href="#" class="block text-sm text-[#AECFE6]">Movimentos</a>
+                <button onclick="closeModal()" class="group flex items-center gap-2 md:gap-3 text-white hover:text-[#CCB146] transition-colors">
+                    <span class="hidden md:block text-xs font-bold uppercase tracking-widest">Fechar</span>
+                    <div class="p-2 md:p-3 bg-white/5 rounded-full group-hover:bg-white/10 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 md:w-6 md:h-6"></i>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Corpo do Menu (Scrollavel) -->
+            <div class="flex-1 overflow-y-auto">
+                <div class="container mx-auto px-4 md:px-12 py-8 md:py-12">
+                    <!-- Search -->
+                    <div class="max-w-2xl mb-8 md:mb-12">
+                        <div class="relative group">
+                            <i data-lucide="search" class="absolute left-4 md:left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-white/50 group-focus-within:text-[#CCB146] transition-colors"></i>
+                            <input type="text" placeholder="O QUE VOCÊ PROCURA?" class="w-full bg-white/5 border border-white/10 rounded-full py-3 md:py-5 pl-12 md:pl-16 pr-6 text-white placeholder-white/30 focus:outline-none focus:border-[#CCB146] focus:bg-white/10 transition-all text-xs md:text-sm lg:text-base uppercase tracking-widest font-bold">
                         </div>
                     </div>
-                    <button class="flex items-center justify-between w-full text-left py-2 md:py-3">
-                        <span class="text-lg md:text-3xl font-black uppercase text-white hover:text-[#CCB146] transition-colors">Agenda</span>
-                    </button>
-                </div>
 
-                <!-- Coluna Direita -->
-                <div class="col-span-1 md:col-span-7">
-                    <h3 class="text-[#CCB146] text-xs font-bold uppercase tracking-widest border-b border-white/10 pb-2 mb-4">Explorar</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
-                        <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm py-2 border-b border-white/5 md:border-none">
-                            <i data-lucide="book-open" class="w-4 h-4 opacity-70"></i> Conhecimento
-                        </a>
-                        <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm py-2 border-b border-white/5 md:border-none">
-                            <i data-lucide="users" class="w-4 h-4 opacity-60"></i> Empresas
-                        </a>
-                        <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm py-2 border-b border-white/5 md:border-none">
-                            <i data-lucide="globe" class="w-4 h-4 opacity-60"></i> HUB ODS
-                        </a>
-                        <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm py-2 border-b border-white/5 md:border-none">
-                            <i data-lucide="briefcase" class="w-4 h-4 opacity-70"></i> Programas
-                        </a>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 pb-8">
+                        <!-- Coluna Esquerda -->
+                        <div class="lg:col-span-5 space-y-2">
+                            <h3 class="text-[#CCB146] text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 border-b border-white/10 pb-2">Destaques</h3>
+                            
+                            <!-- Dropdown: Pacto Global -->
+                            <div class="group border-b border-white/5">
+                                <button class="menu-accordion-trigger flex items-center justify-between w-full text-left py-2 md:py-3 transition-all duration-300 hover:pl-2">
+                                    <span class="text-xl md:text-3xl lg:text-4xl font-black uppercase text-white group-hover:text-[#CCB146] transition-colors">Pacto Global</span>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-white/50 transition-transform duration-300"></i>
+                                </button>
+                                <div class="menu-accordion-content hidden pl-4 border-l-2 border-[#CCB146]/30 ml-2 py-4 space-y-2">
+                                    <a href="#" class="block text-base md:text-lg text-[#AECFE6] hover:text-white font-medium">Sobre Nós</a>
+                                    <a href="#" class="block text-base md:text-lg text-[#AECFE6] hover:text-white font-medium">Princípios</a>
+                                    <a href="#" class="block text-base md:text-lg text-[#AECFE6] hover:text-white font-medium">Movimentos</a>
+                                    <a href="#" class="block text-base md:text-lg text-[#AECFE6] hover:text-white font-medium">Plataformas de Ação</a>
+                                    <a href="#" class="block text-base md:text-lg text-[#AECFE6] hover:text-white font-medium">Governança</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Static Link -->
+                            <div class="border-b border-white/5">
+                                <button class="flex items-center justify-between w-full text-left py-2 md:py-3 group hover:pl-2 transition-all">
+                                    <span class="text-xl md:text-3xl lg:text-4xl font-black uppercase text-white group-hover:text-[#CCB146]">Agenda de Eventos</span>
+                                </button>
+                            </div>
+                            <!-- Static Link -->
+                            <div class="border-b border-white/5">
+                                <button class="flex items-center justify-between w-full text-left py-2 md:py-3 group hover:pl-2 transition-all">
+                                    <span class="text-xl md:text-3xl lg:text-4xl font-black uppercase text-white group-hover:text-[#CCB146]">Notícias</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Coluna Direita -->
+                        <div class="lg:col-span-7">
+                            <h3 class="text-[#CCB146] text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4 md:mb-6 border-b border-white/10 pb-2">Explorar</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-2 md:gap-y-4">
+                                
+                                <!-- Dropdown: Conhecimento -->
+                                <div class="group">
+                                    <button class="menu-accordion-trigger flex items-center justify-between w-full text-left py-2 transition-all hover:text-[#CCB146] text-white font-bold uppercase tracking-wide text-xs md:text-sm lg:text-base">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="book-open" class="w-4 h-4 opacity-60"></i> Conhecimento
+                                        </div>
+                                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300"></i>
+                                    </button>
+                                    <div class="menu-accordion-content hidden pl-8 py-2 space-y-2">
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Publicações</a>
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Academy</a>
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Cursos & Workshops</a>
+                                    </div>
+                                </div>
+
+                                <!-- Dropdown: Programas -->
+                                <div class="group">
+                                    <button class="menu-accordion-trigger flex items-center justify-between w-full text-left py-2 transition-all hover:text-[#CCB146] text-white font-bold uppercase tracking-wide text-xs md:text-sm lg:text-base">
+                                        <div class="flex items-center gap-3">
+                                            <i data-lucide="briefcase" class="w-4 h-4 opacity-60"></i> Programas
+                                        </div>
+                                        <i data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300"></i>
+                                    </button>
+                                    <div class="menu-accordion-content hidden pl-8 py-2 space-y-2">
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Ambição pelos ODS</a>
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Inova 2030</a>
+                                        <a href="#" class="block text-[#AECFE6] hover:text-white text-[10px] md:text-xs font-medium">Liderança de Impacto</a>
+                                    </div>
+                                </div>
+
+                                <!-- Static Links -->
+                                <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm lg:text-base py-2 transition-colors">
+                                    <i data-lucide="users" class="w-4 h-4 opacity-60"></i> Empresas Participantes
+                                </a>
+                                <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm lg:text-base py-2 transition-colors">
+                                    <i data-lucide="bar-chart-3" class="w-4 h-4 opacity-60"></i> Comunicação de Progresso
+                                </a>
+                                <a href="#" class="flex items-center gap-3 text-white/80 hover:text-white font-bold uppercase tracking-wide text-xs md:text-sm lg:text-base py-2 transition-colors">
+                                    <i data-lucide="target" class="w-4 h-4 opacity-60"></i> ESG & Agenda 2030
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Footer Menu -->
-            <div class="p-4 md:p-6 bg-[#0B1220] border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 shrink-0">
-                <button class="w-full md:w-auto px-6 py-3 border border-white/20 text-white text-xs font-bold rounded-full hover:bg-white hover:text-[#1E3250] transition-colors">Área do Participante</button>
-                <div class="flex flex-col items-center md:items-end opacity-70">
-                    <span class="text-[8px] text-white/50 uppercase tracking-widest mb-1">Apoiadores</span>
-                    <div class="flex gap-4 text-white font-bold text-xs"><span>aegea</span><span class="border-l border-white/20 pl-4">MRV</span></div>
+            <!-- Footer do Menu -->
+            <div class="p-6 md:p-12 border-t border-white/10 bg-[#0B1220] shrink-0">
+                <div class="flex flex-col xl:flex-row justify-between items-center gap-6 xl:gap-8">
+                    <button class="w-full xl:w-auto px-8 py-4 text-xs font-bold border border-white/20 text-white rounded-full hover:bg-white hover:text-[#1E3250] uppercase tracking-wider">
+                        Área do Participante
+                    </button>
+                    <div class="flex flex-col items-center">
+                        <span class="text-[8px] uppercase tracking-widest mb-2 text-white/50">Apoiadores Institucionais</span>
+                        <div class="flex items-center gap-6">
+                             <div class="text-white font-serif font-bold italic opacity-90">aegea</div>
+                             <div class="h-3 w-px bg-white/30"></div>
+                             <div class="text-white font-black opacity-90"><span class="text-[#297D6D]">M</span>RV</div>
+                             <div class="h-3 w-px bg-white/30"></div>
+                             <div class="text-white font-sans font-bold text-[10px] uppercase opacity-90"><span class="text-[#297D6D]">Schneider</span> Electric</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -203,38 +288,57 @@
 
     <!-- 3. Bento Grid Template -->
     <template id="tpl-bento">
-        <div class="w-full flex justify-center py-6 md:py-10 px-0 md:px-4 bg-[#F6F8FB]">
-            <!-- Grid vira 1 coluna no mobile, 4 no desktop -->
-            <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[200px] md:auto-rows-[250px] px-4 md:px-0">
-                
-                <!-- Item Grande (2x2 no desktop) -->
-                <div class="col-span-1 md:col-span-2 row-span-2 bg-[#1E3250] rounded-xl overflow-hidden relative group cursor-pointer shadow-lg">
-                    <div class="absolute inset-0 bg-gray-800"></div> 
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] to-transparent opacity-90"></div>
-                    <div class="absolute inset-0 p-6 md:p-8 flex flex-col justify-end">
-                        <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-3 flex items-center gap-2 text-white"><span class="w-2 h-2 rounded-sm bg-[#297D6D]"></span>Meio Ambiente</span>
-                        <h3 class="font-black text-white text-2xl md:text-4xl uppercase leading-[0.9] mb-3">Movimento +Água</h3>
-                        <p class="text-[#AECFE6] text-xs md:text-sm">Garantindo a segurança hídrica no Brasil.</p>
+        <div class="w-full flex justify-center py-12 md:py-20 px-4 md:px-8 bg-[#F6F8FB]">
+            <div class="w-full max-w-7xl">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12 gap-6">
+                    <div class="max-w-xl">
+                        <span class="text-[#1E3250] font-bold text-[10px] md:text-xs uppercase tracking-widest mb-2 block">Destaques</span>
+                        <h2 class="text-2xl md:text-3xl lg:text-5xl font-black uppercase text-[#1E3250] leading-tight">Acelerando o <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#297D6D] to-[#1E3250]">Impacto</span></h2>
                     </div>
+                    <button class="text-[#1E3250] hover:bg-gray-100 px-4 py-2 rounded-full border border-[#1E3250]/10 text-[10px] md:text-xs font-bold uppercase tracking-wider">Ver Tudo</button>
                 </div>
-                
-                <!-- Item Pequeno 1 -->
-                <div class="col-span-1 row-span-1 bg-[#1E3250] rounded-xl overflow-hidden relative group cursor-pointer shadow-lg">
-                    <div class="absolute inset-0 bg-gray-700"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] to-transparent opacity-90"></div>
-                    <div class="absolute inset-0 p-6 flex flex-col justify-end">
-                        <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-2 text-white"><span class="text-[#6E417A] mr-1">●</span>Human Rights</span>
-                        <h3 class="font-black text-white text-lg md:text-xl uppercase">Elas Lideram</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[minmax(250px,auto)]">
+                    <!-- Tile 1: Large -->
+                    <div class="md:col-span-2 md:row-span-2 min-h-[300px] md:min-h-[500px] relative overflow-hidden bg-[#1E3250] rounded-xl cursor-pointer shadow-lg group">
+                         <img src="https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?q=80&w=1974&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                         <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] via-[#1E3250]/20 to-transparent opacity-90"></div>
+                         <div class="absolute inset-0 p-5 md:p-8 flex flex-col justify-end">
+                            <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-3 flex items-center gap-2 text-white"><span class="w-2 h-2 rounded-sm bg-[#297D6D]"></span>Meio Ambiente</span>
+                            <h3 class="font-black text-white text-2xl md:text-3xl lg:text-5xl uppercase leading-[0.9] mb-3">Movimento +Água</h3>
+                            <p class="text-[#AECFE6] text-xs md:text-sm line-clamp-2">Uma coalizão para garantir a segurança hídrica no Brasil, impactando milhões de vidas.</p>
+                         </div>
                     </div>
-                </div>
-                
-                <!-- Item Pequeno 2 -->
-                <div class="col-span-1 row-span-1 bg-[#1E3250] rounded-xl overflow-hidden relative group cursor-pointer shadow-lg">
-                    <div class="absolute inset-0 bg-gray-600"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] to-transparent opacity-90"></div>
-                    <div class="absolute inset-0 p-6 flex flex-col justify-end">
-                        <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-2 text-white"><span class="text-[#EC3740] mr-1">●</span>Integridade</span>
-                        <h3 class="font-black text-white text-lg md:text-xl uppercase">Integridade Já</h3>
+                    
+                    <!-- Tile 2: Small -->
+                    <div class="md:col-span-1 md:row-span-1 min-h-[250px] relative overflow-hidden bg-[#1E3250] rounded-xl cursor-pointer shadow-lg group">
+                        <img src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] via-[#1E3250]/20 to-transparent opacity-90"></div>
+                        <div class="absolute inset-0 p-5 flex flex-col justify-end">
+                            <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-2 flex items-center gap-2 text-white"><span class="w-2 h-2 rounded-sm bg-[#6E417A]"></span>Direitos Humanos</span>
+                            <h3 class="font-black text-white text-lg md:text-xl uppercase leading-tight">Elas Lideram 2030</h3>
+                        </div>
+                    </div>
+
+                    <!-- Tile 3: Small -->
+                    <div class="md:col-span-1 md:row-span-1 min-h-[250px] relative overflow-hidden bg-[#1E3250] rounded-xl cursor-pointer shadow-lg group">
+                        <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=2032&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] via-[#1E3250]/20 to-transparent opacity-90"></div>
+                        <div class="absolute inset-0 p-5 flex flex-col justify-end">
+                            <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-2 flex items-center gap-2 text-white"><span class="w-2 h-2 rounded-sm bg-[#EC3740]"></span>Anticorrupção</span>
+                            <h3 class="font-black text-white text-lg md:text-xl uppercase leading-tight">Integridade Já</h3>
+                        </div>
+                    </div>
+
+                    <!-- Tile 4: Wide -->
+                    <div class="md:col-span-2 md:row-span-1 min-h-[250px] relative overflow-hidden bg-[#1E3250] rounded-xl cursor-pointer shadow-lg group">
+                         <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100">
+                         <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] via-[#1E3250]/20 to-transparent opacity-90"></div>
+                         <div class="absolute inset-0 p-5 md:p-8 flex flex-col justify-end">
+                            <span class="font-bold text-[10px] uppercase tracking-[0.2em] mb-2 flex items-center gap-2 text-white"><span class="w-2 h-2 rounded-sm bg-[#CCB146]"></span>Liderança</span>
+                            <h3 class="font-black text-white text-lg md:text-2xl uppercase leading-tight">Fórum de CEOs 2026</h3>
+                            <p class="text-[#AECFE6] text-xs md:text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity">Grandes líderes debatendo o futuro da economia verde.</p>
+                         </div>
                     </div>
                 </div>
             </div>
@@ -243,21 +347,34 @@
 
     <!-- 4. Hero Template -->
     <template id="tpl-hero">
-        <div class="w-full flex justify-center py-4 md:py-10 px-2 md:px-4">
-            <div class="relative w-full max-w-5xl min-h-[450px] md:h-[500px] bg-[#0B1220] rounded-2xl md:rounded-[40px] overflow-hidden shadow-2xl group flex flex-col justify-center">
-                <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] to-transparent z-10"></div>
+        <div class="w-full flex justify-center pt-20 pb-8 px-2 md:px-6 bg-white">
+            <div class="relative w-full max-w-7xl h-[60vh] md:h-[65vh] lg:h-[80vh] rounded-2xl md:rounded-[40px] overflow-hidden shadow-2xl bg-[#0B1220] group">
+                <!-- Background Image -->
+                <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover opacity-100 scale-100 transition-transform duration-10000">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#1E3250] via-[#1E3250]/40 to-transparent opacity-90"></div>
+                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+                
                 <!-- Conteúdo -->
-                <div class="relative z-20 flex flex-col justify-center items-center text-center p-6 md:p-8">
-                    <span class="inline-block px-3 py-1 bg-white text-[#1E3250] text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-sm shadow-lg mb-4 md:mb-6">Ambição 2030</span>
-                    <h1 class="text-3xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.95] drop-shadow-2xl mb-4 md:mb-6">
-                        Unindo Empresas,<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-[#CCB146] to-white">Mundo Melhor</span>
-                    </h1>
-                    <p class="text-sm md:text-lg text-[#AECFE6] max-w-xl font-medium leading-relaxed mb-6 md:mb-8 hidden sm:block">A maior iniciativa de sustentabilidade corporativa do mundo.</p>
-                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto">
-                        <button class="px-6 py-3 bg-[#297D6D] text-white text-xs md:text-sm font-bold uppercase tracking-wider rounded-full shadow-lg flex items-center justify-center gap-2">
+                <div class="absolute inset-0 flex flex-col justify-center items-center px-4 md:px-12 text-center z-20">
+                     <span class="inline-block px-3 py-1 bg-white text-[#1E3250] text-[9px] md:text-[10px] font-black uppercase tracking-widest rounded-sm shadow-lg mb-4 md:mb-6">Ambição 2030</span>
+                     
+                     <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white uppercase tracking-tighter leading-[1.0] md:leading-[0.95] drop-shadow-2xl mb-4 md:mb-6">
+                        Unindo Empresas,<br/>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#CCB146] to-white">Mundo Melhor</span>
+                     </h1>
+                     
+                     <p class="text-xs sm:text-sm md:text-base lg:text-xl text-[#AECFE6] max-w-xs md:max-w-lg mx-auto font-medium leading-relaxed mb-6 md:mb-10 line-clamp-3 md:line-clamp-none">
+                        A maior iniciativa de sustentabilidade corporativa do mundo. Lidere a mudança com os Dez Princípios.
+                     </p>
+                     
+                     <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center w-full sm:w-auto px-4 sm:px-0">
+                        <button class="bg-[#297D6D] text-white hover:bg-[#1E5C4F] shadow-lg shadow-[#297D6D]/20 px-6 py-3.5 rounded-full font-bold uppercase tracking-wider text-xs md:text-sm flex items-center justify-center gap-2">
                             Quero Aderir <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
-                    </div>
+                        <button class="border-2 border-white/30 text-white hover:bg-white hover:text-[#1E3250] backdrop-blur-sm px-6 py-3.5 rounded-full font-bold uppercase tracking-wider text-xs md:text-sm flex items-center justify-center gap-2">
+                            Ver o Manifesto <i data-lucide="play" class="w-4 h-4"></i>
+                        </button>
+                     </div>
                 </div>
             </div>
         </div>
@@ -265,25 +382,62 @@
 
     <!-- 5. Impact Template -->
     <template id="tpl-impact">
-        <div class="w-full bg-[#1E3250] py-12 md:py-16 px-4 relative overflow-hidden">
-            <div class="w-full max-w-5xl mx-auto relative z-10">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-                    <div class="max-w-xl">
-                        <span class="inline-block py-1 px-3 rounded bg-[#297D6D]/20 border border-[#297D6D]/30 text-[#297D6D] text-[10px] font-bold uppercase tracking-widest mb-4">Magnitude</span>
-                        <h2 class="text-2xl md:text-4xl font-black text-white uppercase tracking-tight leading-tight">A maior iniciativa de <br/><span class="text-[#CCB146]">sustentabilidade</span>.</h2>
+        <div class="w-full bg-[#1E3250] py-12 md:py-20 lg:py-32 relative overflow-hidden">
+            <!-- Pattern Background -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;"></div>
+            
+            <div class="container mx-auto px-4 md:px-6 relative z-10 max-w-7xl">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end mb-12 md:mb-16 gap-8">
+                    <div class="max-w-3xl">
+                        <span class="inline-block py-1 px-3 rounded bg-[#297D6D]/20 border border-[#297D6D]/30 text-[#297D6D] text-[9px] md:text-[10px] font-bold uppercase tracking-widest mb-4 backdrop-blur-sm">
+                            Nossa Magnitude
+                        </span>
+                        <h2 class="text-2xl md:text-4xl lg:text-6xl font-black text-white uppercase tracking-tight leading-[1.1]">
+                            A maior iniciativa de <br/>
+                            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#CCB146] to-[#F5E6A3]">sustentabilidade corporativa</span> <br/>
+                            do mundo.
+                        </h2>
+                        <p class="mt-4 md:mt-6 text-[#AECFE6] text-sm md:text-base lg:text-lg max-w-xl leading-relaxed">
+                            Conectando estratégias empresariais aos Dez Princípios Universais.
+                        </p>
                     </div>
+                     <button class="group flex items-center gap-3 px-6 py-3 md:px-8 md:py-4 bg-transparent border border-white/30 text-white rounded-full hover:bg-white hover:text-[#1E3250] transition-all duration-300 font-bold uppercase tracking-widest text-[10px] md:text-xs">
+                        Saiba Mais <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
                 </div>
-                <!-- Grid Responsivo: 2 colunas mobile, 4 desktop -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-8">
-                    <div class="group">
-                        <h3 class="text-3xl md:text-4xl font-black text-white tracking-tighter mb-1">22k+</h3>
-                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-2"></div>
-                        <p class="text-[10px] md:text-xs font-bold text-white uppercase">Empresas</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8 lg:gap-12 border-t border-white/10 pt-8 md:pt-12">
+                    <!-- Stats... -->
+                    <div>
+                        <div class="mb-4 opacity-50"><i data-lucide="building-2" class="w-8 h-8 text-[#CCB146]"></i></div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">22.485</h3>
+                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-3"></div>
+                        <p class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Empresas</p>
+                        <p class="text-[10px] text-[#AECFE6] uppercase tracking-wide mt-1">Comprometidas</p>
                     </div>
-                    <div class="group">
-                        <h3 class="text-3xl md:text-4xl font-black text-white tracking-tighter mb-1">167</h3>
-                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-2"></div>
-                        <p class="text-[10px] md:text-xs font-bold text-white uppercase">Países</p>
+                     <div>
+                        <div class="mb-4 opacity-50"><i data-lucide="globe" class="w-8 h-8 text-[#297D6D]"></i></div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">167</h3>
+                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-3"></div>
+                        <p class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Países</p>
+                    </div>
+                     <div>
+                        <div class="mb-4 opacity-50"><i data-lucide="landmark" class="w-8 h-8 text-[#AECFE6]"></i></div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">3.024</h3>
+                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-3"></div>
+                        <p class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Organizações</p>
+                    </div>
+                    <div>
+                        <div class="mb-4 opacity-50"><i data-lucide="map-pin" class="w-8 h-8 text-[#CCB146]"></i></div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">62</h3>
+                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-3"></div>
+                        <p class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Redes Locais</p>
+                    </div>
+                     <div>
+                        <div class="mb-4 opacity-50"><i data-lucide="users" class="w-8 h-8 text-white"></i></div>
+                        <h3 class="text-3xl md:text-5xl font-black text-white tracking-tighter mb-1">25.509</h3>
+                        <div class="h-1 w-8 bg-[#CCB146] rounded-full mb-3"></div>
+                        <p class="text-xs md:text-sm font-bold text-white uppercase tracking-wider">Participantes</p>
                     </div>
                 </div>
             </div>
@@ -292,28 +446,59 @@
 
     <!-- 6. Footer Template -->
     <template id="tpl-footer">
-        <div class="w-full bg-[#1E3250] text-white py-12 px-4 border-t border-white/10">
-            <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                <div class="md:col-span-2 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-[#1E3250]"><span class="font-bold text-xs">UN</span></div>
-                        <span class="text-lg font-black uppercase">UN Global Compact</span>
-                    </div>
-                    <p class="text-[#AECFE6] text-xs md:text-sm max-w-xs leading-relaxed">
-                        Conectando estratégias empresariais aos Dez Princípios Universais.
+        <div class="w-full bg-[#1E3250] text-white pt-12 md:pt-24 pb-12 border-t border-white/10">
+            <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-12 mb-20 max-w-7xl">
+                <div class="lg:col-span-2 space-y-6">
+                    <h2 class="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#1E3250]">
+                            <i data-lucide="globe" class="w-6 h-6"></i>
+                        </div>
+                        UN Global Compact
+                    </h2>
+                    <p class="text-[#AECFE6] max-w-sm leading-relaxed text-sm">
+                        Como uma iniciativa especial do Secretário-Geral da ONU, o Pacto Global das Nações Unidas é um chamado para que as empresas alinhem suas estratégias e operações com Dez Princípios universais.
                     </p>
+                    <div class="flex gap-4 pt-4">
+                        <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-bold text-xs">IN</div>
+                        <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-bold text-xs">IG</div>
+                        <div class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center font-bold text-xs">YT</div>
+                    </div>
                 </div>
+                
                 <div>
-                    <h4 class="font-bold text-[#CCB146] uppercase tracking-widest mb-4 text-xs">Organização</h4>
-                    <ul class="space-y-2 text-sm text-[#AECFE6]"><li>Sobre Nós</li><li>Equipe</li><li>Carreiras</li></ul>
+                    <h4 class="font-bold text-[#CCB146] uppercase tracking-widest mb-6 text-xs">Organização</h4>
+                    <ul class="space-y-4 text-sm font-medium text-[#AECFE6]">
+                        <li>Sobre Nós</li>
+                        <li>Nossa Equipe</li>
+                        <li>Conselho</li>
+                        <li>Carreiras</li>
+                    </ul>
                 </div>
+                
                 <div>
-                    <h4 class="font-bold text-[#CCB146] uppercase tracking-widest mb-4 text-xs">Contato</h4>
+                    <h4 class="font-bold text-[#CCB146] uppercase tracking-widest mb-6 text-xs">Temas</h4>
+                    <ul class="space-y-4 text-sm font-medium text-[#AECFE6]">
+                        <li>Direitos Humanos</li>
+                        <li>Trabalho</li>
+                        <li>Meio Ambiente</li>
+                        <li>Anticorrupção</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-[#CCB146] uppercase tracking-widest mb-6 text-xs">Contato</h4>
                     <p class="text-[#AECFE6] text-sm mb-4">secretaria@pactoglobal.org.br</p>
+                    <button class="w-full border border-white/30 py-2 rounded font-bold uppercase text-xs">Imprensa</button>
                 </div>
             </div>
-            <div class="w-full max-w-6xl mx-auto border-t border-white/10 pt-8 text-xs text-[#4C6B8B] uppercase font-bold tracking-wide text-center md:text-left">
-                <p>© 2026 UN Global Compact Network Brazil.</p>
+            
+            <div class="container mx-auto px-6 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-[#4C6B8B] font-medium uppercase tracking-wide gap-4 max-w-7xl">
+                <p>© 2026 UN Global Compact Network Brazil. All rights reserved.</p>
+                <div class="flex gap-6">
+                    <span>Termos de Uso</span>
+                    <span>Privacidade</span>
+                    <span>Cookies</span>
+                </div>
             </div>
         </div>
     </template>
@@ -357,7 +542,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Abstract Representation (Hidden on Mobile) -->
+                <!-- Abstract Representation -->
                 <div class="hidden md:flex justify-center items-center relative h-full min-h-[200px]">
                     <div class="w-48 h-32 border-2 border-dashed border-gray-600 rounded-lg absolute top-0 left-10 bg-[#1E3250] z-0 flex items-center justify-center opacity-50">
                         <span class="text-gray-500 font-bold text-xs">LEGADO v3</span>
@@ -387,13 +572,16 @@
                 <button class="tab-btn text-sm flex items-center gap-2" data-tab="squad">
                     <i data-lucide="users" class="w-4 h-4"></i>Squad
                 </button>
+                <button class="tab-btn text-sm flex items-center gap-2" data-tab="sitemap">
+                    <i data-lucide="globe-2" class="w-4 h-4"></i>Inventário & Sitemap
+                </button>
             </nav>
         </div>
 
-        <!-- TAB CONTENT: ROADMAP -->
+        <!-- TAB CONTENT: ROADMAP (Q1-Q4) -->
         <div id="roadmap" class="tab-content animate-fade-in">
             <div class="roadmap-container">
-                <!-- FASE 1 -->
+                <!-- FASE 1: Q1 -->
                 <div class="roadmap-phase">
                     <div class="phase-badge">Q1</div>
                     <div class="phase-title">
@@ -406,95 +594,72 @@
                         <div class="deliverable-card border-t-4 border-t-[#009EDB]">
                             <span class="deliverable-tag tag-react">CRÍTICO</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Super Menu & Header</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Substituição total do header v3. Navegação unificada.</p>
+                            <p class="text-xs text-gray-500 flex-grow">Substituição total do header v3.</p>
                         </div>
                         <div class="deliverable-card border-t-4 border-t-[#009EDB]">
                             <span class="deliverable-tag tag-react">BRANDING</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Footer Institucional</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Novo rodapé React com logos de apoiadores.</p>
+                            <p class="text-xs text-gray-500 flex-grow">Novo rodapé React.</p>
                         </div>
-                        <div class="deliverable-card border-t-4 border-t-[#009EDB]">
+                         <div class="deliverable-card border-t-4 border-t-[#009EDB]">
                             <span class="deliverable-tag tag-react">MOBILE</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Mobile Navigation</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Menu lateral full-screen responsivo.</p>
-                        </div>
-                        <div class="deliverable-card border-t-4 border-t-gray-400 bg-gray-50">
-                            <span class="deliverable-tag tag-page">PÁGINA</span>
-                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Home v3 (Temporária)</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Limpeza de banners antigos.</p>
+                            <p class="text-xs text-gray-500 flex-grow">Menu lateral full-screen.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- FASE 2 -->
+                <!-- FASE 2: Q2 -->
                 <div class="roadmap-phase">
-                    <div class="phase-badge">Q2 Start</div>
+                    <div class="phase-badge">Q2</div>
                     <div class="phase-title">
                         FASE 2: A Vitrine
-                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Abr - Mai</span>
+                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Abr - Jun</span>
                     </div>
-                    <p class="text-sm text-gray-600 max-w-2xl mt-2 mb-6">Refatoração das páginas de entrada e Homepage.</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="deliverable-card border-t-4 border-t-[#009EDB]">
                             <span class="deliverable-tag tag-react">CONVERSÃO</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Hero Carrossel</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Slider curvo com storytelling visual.</p>
+                            <p class="text-xs text-gray-500 flex-grow">Slider com storytelling visual.</p>
                         </div>
                         <div class="deliverable-card border-t-4 border-t-[#059669]">
                             <span class="deliverable-tag tag-dados">AUTORIDADE</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Seção de Impacto</h5>
                             <p class="text-xs text-gray-500 flex-grow">Grid de números dinâmicos.</p>
                         </div>
-                        <div class="deliverable-card border-t-4 border-t-gray-400 bg-gray-50">
-                            <span class="deliverable-tag tag-page">REFATORAÇÃO</span>
-                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Como Aderir</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Funil de Conversão Interativo.</p>
-                        </div>
-                        <div class="deliverable-card border-t-4 border-t-[#D97706]">
-                            <span class="deliverable-tag tag-legacy">BACKEND</span>
-                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Search Híbrido</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Busca inteligente no Super Menu.</p>
-                        </div>
                     </div>
                 </div>
 
-                <!-- FASE 3 -->
+                <!-- FASE 3: Q3 -->
                 <div class="roadmap-phase">
-                    <div class="phase-badge">Q2 End</div>
+                    <div class="phase-badge">Q3</div>
                     <div class="phase-title">
-                        FASE 3: Hub de Conteúdo
-                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Jun - Jul</span>
+                        FASE 3: Hub de Conteúdo & Plataformas
+                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Jul - Set</span>
                     </div>
-                    <p class="text-sm text-gray-600 max-w-2xl mt-2 mb-6">Deep Dive. Reestruturação das listagens internas.</p>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="deliverable-card border-t-4 border-t-[#009EDB]">
                             <span class="deliverable-tag tag-react">EXPLORABILIDADE</span>
                             <h5 class="font-bold text-[#1E3250] text-sm mb-1">Hubs Temáticos</h5>
                             <p class="text-xs text-gray-500 flex-grow">Layout de mídia com filtros.</p>
                         </div>
-                        <div class="deliverable-card border-t-4 border-t-gray-400 bg-gray-50">
-                            <span class="deliverable-tag tag-page">REFATORAÇÃO</span>
-                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Biblioteca</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Novo hub de conhecimento.</p>
-                        </div>
-                        <div class="deliverable-card border-t-4 border-t-gray-400 bg-gray-50">
-                            <span class="deliverable-tag tag-page">REFATORAÇÃO</span>
-                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Movimentos</h5>
-                            <p class="text-xs text-gray-500 flex-grow">Landing Page para cada movimento.</p>
+                        <div class="deliverable-card border-t-4 border-t-[#6E417A]">
+                            <span class="deliverable-tag tag-legacy">COMPLEXIDADE</span>
+                            <h5 class="font-bold text-[#1E3250] text-sm mb-1">Plataformas de Ação</h5>
+                            <p class="text-xs text-gray-500 flex-grow">Refatoração e landing page para cada plataforma.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- FASE 4 -->
+                <!-- FASE 4: Q4 -->
                 <div class="roadmap-phase">
-                    <div class="phase-badge">Q3</div>
+                    <div class="phase-badge">Q4</div>
                     <div class="phase-title">
                         FASE 4: Ecossistema
-                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Ago - Set</span>
+                        <span class="text-[9px] font-bold text-[#009EDB] bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase tracking-wide">Out - Dez</span>
                     </div>
-                    <p class="text-sm text-gray-600 max-w-2xl mt-2 mb-6">Legado Zero. O v3 deixa de existir.</p>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
                         <div class="deliverable-card border-t-4 border-t-[#059669]">
@@ -522,9 +687,9 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="box" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Capsule Header</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Header flutuante estilo "Island".</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Header flutuante responsivo.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
 
                 <div class="component-card group" onclick="openModal('tpl-menu')">
@@ -533,9 +698,9 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="sidebar" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Super Menu</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Overlay de tela cheia com busca.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Overlay completo com busca.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
 
                 <div class="component-card group" onclick="openModal('tpl-hero')">
@@ -544,9 +709,9 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="image" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Hero Carrossel</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Slider curvo com conteúdo.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Slider "Unindo Empresas".</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
 
                 <div class="component-card group" onclick="openModal('tpl-bento')">
@@ -555,9 +720,9 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="layout-grid" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Bento Grid</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Grid assimétrico para notícias.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Grid de Notícias e Movimentos.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
 
                 <div class="component-card group" onclick="openModal('tpl-impact')">
@@ -566,9 +731,9 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="bar-chart-2" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Seção de Impacto</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Dados de autoridade.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Dados (22k Empresas, 167 Países).</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
 
                 <div class="component-card group" onclick="openModal('tpl-footer')">
@@ -577,15 +742,16 @@
                             <div class="p-2 bg-blue-50 rounded-lg group-hover:bg-[#009EDB] group-hover:text-white transition-colors"><i data-lucide="layout-template" class="w-5 h-5 text-[#009EDB] group-hover:text-white"></i></div>
                             <h4 class="font-bold text-[#1E3250] text-sm">Footer Institucional</h4>
                         </div>
-                        <span class="comp-status status-ready">Pronto</span>
+                        <span class="comp-status status-ready text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">PRONTO v13</span>
                     </div>
-                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Rodapé estruturado.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
+                    <div class="component-body"><p class="text-xs text-gray-500 mb-4">Rodapé estruturado com links.</p><div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Clique para visualizar</div></div>
                 </div>
             </div>
         </div>
 
         <!-- TAB CONTENT: ARQUITETURA TÉCNICA -->
         <div id="tecnica" class="tab-content hidden space-y-8 animate-fade-in">
+            <!-- (Mantido como estava, sem alterações solicitadas) -->
             <div class="bg-white p-6 md:p-8 rounded-xl border border-gray-200 shadow-sm">
                 <div class="flex items-center gap-3 mb-6">
                     <i data-lucide="layers" class="w-6 h-6 text-[#1E3250]"></i>
@@ -594,11 +760,10 @@
                 <p class="text-gray-600 mb-8 max-w-3xl">
                     A estratégia consiste em "estrangular" o sistema legado gradualmente, injetando novos componentes (Ilhas) até que o antigo desapareça.
                 </p>
-
-                <!-- Diagrama Visual CSS -->
+                <!-- Diagrama -->
                 <div class="flex flex-col md:flex-row gap-4 items-stretch justify-center mb-8">
-                    <!-- Legado -->
-                    <div class="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 relative">
+                     <!-- ... Conteúdo do diagrama mantido ... -->
+                     <div class="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 relative">
                         <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-200 text-gray-600 px-3 py-1 text-[10px] font-bold rounded uppercase tracking-wider">HOST (v3 Legado)</span>
                         <div class="h-full flex flex-col justify-center items-center text-gray-400 gap-2 min-h-[120px]">
                             <i data-lucide="server" class="w-8 h-8"></i>
@@ -611,7 +776,6 @@
                         <i data-lucide="arrow-down" class="w-6 h-6 text-gray-400 md:hidden"></i>
                     </div>
 
-                    <!-- Injeção -->
                     <div class="flex-1 border-2 border-[#009EDB] rounded-lg p-6 bg-[#ECF9FD] relative">
                         <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#009EDB] text-white px-3 py-1 text-[10px] font-bold rounded uppercase tracking-wider shadow-lg">MICRO-APPS (v4 React)</span>
                         <div class="space-y-3 pt-2">
@@ -626,36 +790,17 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-gray-100">
-                    <div class="arch-box">
-                        <i data-lucide="code" class="w-8 h-8 text-[#009EDB] mb-3"></i>
-                        <h4 class="font-bold text-sm mb-2 text-[#1E3250]">React Islands</h4>
-                        <p class="text-xs text-gray-500">Injeção via <code>&lt;div&gt;</code> específicas.</p>
-                    </div>
-                    <div class="arch-box">
-                        <i data-lucide="palette" class="w-8 h-8 text-[#009EDB] mb-3"></i>
-                        <h4 class="font-bold text-sm mb-2 text-[#1E3250]">Tailwind Scoped</h4>
-                        <p class="text-xs text-gray-500">CSS isolado para zero conflito.</p>
-                    </div>
-                    <div class="arch-box">
-                        <i data-lucide="gauge" class="w-8 h-8 text-[#009EDB] mb-3"></i>
-                        <h4 class="font-bold text-sm mb-2 text-[#1E3250]">Performance</h4>
-                        <p class="text-xs text-gray-500">Carregamento <code>defer</code>.</p>
-                    </div>
-                </div>
             </div>
         </div>
 
         <!-- TAB CONTENT: SQUAD -->
         <div id="squad" class="tab-content hidden animate-fade-in">
+             <!-- (Mantido como estava) -->
             <div class="bg-white p-6 md:p-8 rounded-xl border border-gray-200 shadow-sm">
                 <h3 class="text-xl font-bold text-[#1E3250] mb-6 flex items-center gap-2">
                     <i data-lucide="users" class="w-6 h-6 text-[#009EDB]"></i> Squad Ágil & Governança
                 </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <!-- Box 1 -->
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div class="flex gap-4 p-5 rounded-lg bg-gray-50 border border-gray-100 hover:border-[#1E3250] transition-colors">
                         <div class="w-12 h-12 rounded-full bg-[#1E3250] flex items-center justify-center text-white font-bold text-sm shrink-0">PO</div>
                         <div>
@@ -664,8 +809,6 @@
                             <p class="text-sm text-gray-600 leading-snug">Visão estratégica e brand guidelines.</p>
                         </div>
                     </div>
-
-                    <!-- Box 2 -->
                     <div class="flex gap-4 p-5 rounded-lg bg-gray-50 border border-gray-100 hover:border-[#1E3250] transition-colors">
                         <div class="w-12 h-12 rounded-full bg-white border-2 border-[#1E3250] flex items-center justify-center text-[#1E3250] font-bold text-sm shrink-0">HO</div>
                         <div>
@@ -675,45 +818,95 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="mt-8 pt-8 border-t border-gray-100">
-                    <h4 class="font-bold text-[#1E3250] mb-4 text-xs uppercase tracking-widest flex items-center gap-2">
-                        <i data-lucide="bar-chart-2" class="w-4 h-4"></i> KPIs de Sucesso
-                    </h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="text-center p-4 bg-[#ECF9FD] rounded-lg">
-                            <span class="block text-2xl md:text-3xl font-black text-[#009EDB]">+40%</span>
-                            <span class="text-[10px] font-bold text-gray-600 uppercase">Retenção</span>
-                        </div>
-                        <div class="text-center p-4 bg-[#ECF9FD] rounded-lg">
-                            <span class="block text-2xl md:text-3xl font-black text-[#009EDB]">90+</span>
-                            <span class="text-[10px] font-bold text-gray-600 uppercase">Lighthouse</span>
-                        </div>
-                        <div class="text-center p-4 bg-[#ECF9FD] rounded-lg">
-                            <span class="block text-2xl md:text-3xl font-black text-[#009EDB]">100%</span>
-                            <span class="text-[10px] font-bold text-gray-600 uppercase">Mobile Native</span>
-                        </div>
-                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
-                            <span class="block text-2xl md:text-3xl font-black text-[#D4AF37]">&uarr; 2x</span>
-                            <span class="text-[10px] font-bold text-gray-600 uppercase">Leads</span>
-                        </div>
-                    </div>
-                </div>
             </div>
+        </div>
+
+        <!-- TAB CONTENT: INVENTÁRIO & SITEMAP -->
+        <div id="sitemap" class="tab-content hidden animate-fade-in">
+             <div class="bg-white p-6 md:p-8 rounded-xl border border-gray-200 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="globe-2" class="w-6 h-6 text-[#1E3250]"></i>
+                        <h3 class="text-xl font-bold text-[#1E3250]">Mapa de Migração de URLs (Redirect Plan)</h3>
+                    </div>
+                    <button class="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded font-bold text-[#1E3250] transition flex items-center gap-2">
+                        <i data-lucide="download" class="w-3 h-3"></i> Exportar CSV
+                    </button>
+                </div>
+                 <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full seo-table">
+                        <thead>
+                            <tr>
+                                <th>URL Origem (v3)</th>
+                                <th>URL Destino (v4)</th>
+                                <th>Status</th>
+                                <th>Estratégia</th>
+                                <th>Prioridade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>/quem-somos</td>
+                                <td>/sobre</td>
+                                <td><span class="seo-badge bg-green-100 text-green-700">301</span></td>
+                                <td>Consolidação de conteúdo institucional</td>
+                                <td>Alta</td>
+                            </tr>
+                            <!-- ATUALIZAÇÃO AQUI: Separados -->
+                            <tr>
+                                <td>/plataformas-de-acao/*</td>
+                                <td>/plataformas/*</td>
+                                <td><span class="seo-badge bg-yellow-100 text-yellow-700">Refatoração</span></td>
+                                <td>Refatoração Visual e Lógica de Negócio (Restrito)</td>
+                                <td>Alta</td>
+                            </tr>
+                            <tr>
+                                <td>/iniciativas/*</td>
+                                <td>/movimentos/*</td>
+                                <td><span class="seo-badge bg-green-100 text-green-700">301</span></td>
+                                <td>Novas LPs de Alta Conversão (Público)</td>
+                                <td>Alta</td>
+                            </tr>
+                            <!-- Fim da atualização -->
+                            <tr>
+                                <td>/noticias/category/agua</td>
+                                <td>/hub/agua-e-saneamento</td>
+                                <td><span class="seo-badge bg-green-100 text-green-700">301</span></td>
+                                <td>Migração para Hub Temático Vertical</td>
+                                <td>Média</td>
+                            </tr>
+                            <tr>
+                                <td>/biblioteca-virtual</td>
+                                <td>/conhecimento</td>
+                                <td><span class="seo-badge bg-green-100 text-green-700">301</span></td>
+                                <td>Nova interface de busca e filtros</td>
+                                <td>Baixa</td>
+                            </tr>
+                             <tr>
+                                <td>/como-aderir</td>
+                                <td>/aderir (Funil)</td>
+                                <td><span class="seo-badge bg-blue-100 text-blue-700">Reescrita</span></td>
+                                <td>Substituição por App Interativo (SPA)</td>
+                                <td>Crítica</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+             </div>
         </div>
 
     </main>
 
     <!-- COMPONENT RENDER MODAL -->
-    <div id="component-modal" class="fixed inset-0 z-[60] hidden modal-overlay flex items-center justify-center p-4">
-        <div class="bg-white w-full rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col max-h-[90vh]">
+    <div id="component-modal" class="fixed inset-0 z-[60] hidden modal-overlay flex items-center justify-center p-0 md:p-4">
+        <div class="bg-white w-full rounded-none md:rounded-2xl shadow-2xl overflow-hidden animate-fade-in relative flex flex-col h-full md:max-h-[90vh] modal-content">
             <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50 shrink-0">
                 <h3 class="text-sm md:text-lg font-bold text-[#1E3250] flex items-center gap-2">
                     <i data-lucide="eye" class="w-4 h-4 text-[#009EDB]"></i> Visualização
                 </h3>
                 <button onclick="closeModal()" class="p-2 hover:bg-gray-200 rounded-full transition-colors"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button>
             </div>
-            <div class="bg-[#F3F4F6] overflow-y-auto flex-1 preview-container flex items-start md:items-center justify-center">
+            <div class="bg-[#F3F4F6] overflow-y-auto flex-1 preview-container flex items-start justify-center">
                 <!-- Component Container -->
                 <div id="modal-body" class="w-full"></div>
             </div>
@@ -723,7 +916,7 @@
     <footer class="bg-white border-t border-gray-200 mt-auto py-8">
         <div class="container mx-auto px-4 text-center">
             <p class="text-sm text-[#1E3250] font-bold">Pacto Global da ONU - Rede Brasil</p>
-            <p class="text-xs text-gray-400 mt-2">Roadmap Estratégico Digital 2026 • v5.0</p>
+            <p class="text-xs text-gray-400 mt-2">Roadmap Estratégico Digital 2026 • v5.4</p>
         </div>
     </footer>
 
@@ -779,17 +972,31 @@
             if (e.target === this) closeModal();
         });
 
-        // MENU INTERACTION LOGIC
+        // MENU INTERACTION LOGIC (Event Delegation for Dynamic Content)
         function initMenuInteractions() {
-            const triggers = document.querySelectorAll('.menu-accordion-trigger');
+            const modalBody = document.getElementById('modal-body');
+            
+            // Remove previous listeners if any to avoid duplicates (though innerHTML clear handles it mostly)
+            // Ideally we just attach one listener to modalBody and handle bubbling
+            
+            // Using a specific named function for the click handler to avoid duplicate attachments is hard with anonymous funcs
+            // Since we clear modalBody innerHTML every time openModal is called, we can safely just attach listeners to the NEW elements.
+            
+            const triggers = modalBody.querySelectorAll('.menu-accordion-trigger');
+            
             triggers.forEach(trigger => {
-                trigger.addEventListener('click', function() {
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Stop bubbling
+                    // The structure is: button -> sibling div
                     const content = this.nextElementSibling;
                     const chevron = this.querySelector('[data-lucide="chevron-down"]');
-                    if (content.classList.contains('hidden')) {
-                        content.classList.remove('hidden');
-                    } else {
-                        content.classList.add('hidden');
+                    
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        
+                        if (chevron) {
+                            chevron.classList.toggle('rotate-180');
+                        }
                     }
                 });
             });
